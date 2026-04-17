@@ -1,0 +1,208 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Preschool Wayfinding Tour — Styles
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root { --font: 'Inter', system-ui, sans-serif; }
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: #000;
+  font-family: var(--font);
+  touch-action: none;
+}
+
+#app {
+  width: 100vw;
+  height: 100dvh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Screens ─────────────────────────────────────────────────────────────── */
+
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+.screen.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* ── Video ───────────────────────────────────────────────────────────────── */
+
+#tour-video {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+
+#video-label {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 6px 18px;
+  border-radius: 30px;
+  border: 1px solid rgba(255,255,255,0.2);
+  white-space: nowrap;
+}
+
+/* ── Photo ───────────────────────────────────────────────────────────────── */
+
+#photo-container {
+  position: relative;
+  width: 100%; height: 100%;
+}
+
+#tour-photo {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* ── Hotspot arrow ───────────────────────────────────────────────────────── */
+
+#hotspot {
+  position: absolute;
+  /* x/y set via JS using CSS custom properties */
+  left:  calc(var(--hx, 50) * 1% - 30px);
+  top:   calc(var(--hy, 75) * 1% - 30px);
+
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 3px solid rgba(255,255,255,0.9);
+  background: rgba(255,255,255,0.18);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  box-shadow: 0 0 0 0 rgba(255,255,255,0.5);
+  transition: transform 0.15s, background 0.15s;
+
+  /* Desktop: faint until hover */
+  opacity: 0.4;
+  animation: hotspotPulse 2s ease-in-out infinite;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#hotspot svg {
+  width: 26px;
+  height: 26px;
+}
+
+/* Show fully on hover (desktop) */
+#photo-container:hover #hotspot {
+  opacity: 1;
+  animation: none;
+  box-shadow: 0 0 20px 6px rgba(255,255,255,0.35);
+}
+
+/* Mobile (no-hover devices): always fully visible */
+@media (hover: none) {
+  #hotspot {
+    opacity: 0.85;
+  }
+}
+
+#hotspot:active {
+  transform: scale(0.9);
+  background: rgba(255,255,255,0.35);
+}
+
+@keyframes hotspotPulse {
+  0%, 100% { opacity: 0.4; box-shadow: 0 0 0 0 rgba(255,255,255,0.4); }
+  50%       { opacity: 0.75; box-shadow: 0 0 0 12px rgba(255,255,255,0); }
+}
+
+/* ── Progress indicator ──────────────────────────────────────────────────── */
+
+#progress {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+#progress-dots {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 80vw;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.35);
+  border: 1.5px solid rgba(255,255,255,0.6);
+  transition: background 0.3s, transform 0.3s;
+  flex-shrink: 0;
+}
+
+.dot.active {
+  background: #fff;
+  transform: scale(1.35);
+}
+
+.dot.done {
+  background: rgba(255,255,255,0.7);
+}
+
+#progress-label {
+  color: rgba(255,255,255,0.75);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+}
+
+/* ── Transition overlay ──────────────────────────────────────────────────── */
+
+#transition-overlay {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 100;
+  transition: opacity 0.4s ease;
+}
+
+#transition-overlay.visible {
+  opacity: 1;
+  pointer-events: all;
+}

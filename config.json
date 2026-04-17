@@ -1,0 +1,19 @@
+{
+  "introVideo": "video1/video1.mp4",
+  "outroVideo": "video1/video2.mp4",
+  "photos": [
+    { "src": "photo1/1.jpg",                        "hotspot": { "x": 50, "y": 75 } },
+    { "src": "photo1/2.jpg",                        "hotspot": { "x": 50, "y": 75 } },
+    { "src": "photo1/3.jpg",                        "hotspot": { "x": 50, "y": 75 } },
+    { "src": "photo1/4.jpg",                        "hotspot": { "x": 50, "y": 75 } },
+    { "src": "photo1/5.jpg",                        "hotspot": { "x": 50, "y": 75 } },
+    { "src": "photo1/2026-04-17 16.15.21.jpg",      "hotspot": { "x": 50, "y": 75 } },
+    { "src": "photo1/2026-04-17 16.15.26.jpg",      "hotspot": { "x": 50, "y": 75 } },
+    { "src": "photo1/2026-04-17 16.15.33.jpg",      "hotspot": { "x": 50, "y": 75 } },
+    { "src": "photo1/2026-04-17 16.15.37.jpg",      "hotspot": { "x": 50, "y": 75 } },
+    { "src": "photo1/2026-04-17 16.15.43.jpg",      "hotspot": { "x": 50, "y": 75 } },
+    { "src": "photo1/2026-04-17 16.15.48.jpg",      "hotspot": { "x": 50, "y": 75 } },
+    { "src": "photo1/2026-04-17 16.15.53.jpg",      "hotspot": { "x": 50, "y": 75 } },
+    { "src": "photo1/2026-04-17 16.16.05.jpg",      "hotspot": { "x": 50, "y": 75 } }
+  ]
+}

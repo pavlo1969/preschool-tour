@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Preschool Tour</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ── Video screen ─────────────────────────────────────────────────── -->
+  <div id="video-screen" class="screen active">
+    <video id="tour-video" playsinline webkit-playsinline>
+      <source id="video-src" src="" type="video/mp4">
+    </video>
+    <div id="video-label"></div>
+  </div>
+
+  <!-- ── Photo screen ─────────────────────────────────────────────────── -->
+  <div id="photo-screen" class="screen">
+    <div id="photo-container">
+      <img id="tour-photo" src="" alt="Tour step" draggable="false">
+
+      <!-- Hotspot arrow — position set via CSS custom properties -->
+      <button id="hotspot" aria-label="Continue to next step">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+             stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Progress indicator -->
+    <div id="progress">
+      <div id="progress-dots"></div>
+      <div id="progress-label"></div>
+    </div>
+  </div>
+
+  <!-- ── Transition overlay ────────────────────────────────────────────── -->
+  <div id="transition-overlay"></div>
+
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
