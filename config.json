@@ -5,7 +5,6 @@
     { "src": "photo1/1.jpg",                        "hotspot": { "x": 50, "y": 75 } },
     { "src": "photo1/2.jpg",                        "hotspot": { "x": 50, "y": 75 } },
     { "src": "photo1/3.jpg",                        "hotspot": { "x": 50, "y": 75 } },
-    { "src": "photo1/4.jpg",                        "hotspot": { "x": 50, "y": 75 } },
     { "src": "photo1/5.jpg",                        "hotspot": { "x": 50, "y": 75 } },
     { "src": "photo1/2026-04-17 16.15.21.jpg",      "hotspot": { "x": 50, "y": 75 } },
     { "src": "photo1/2026-04-17 16.15.26.jpg",      "hotspot": { "x": 50, "y": 75 } },
