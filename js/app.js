@@ -1,6 +1,6 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// Preschool Wayfinding Tour — App
-// Loads config.json, then runs: intro video → photo sequence → outro video
+// Preschool Wayfinding Tour — App (Redesigned)
+// Loads config.json, then runs: splash → intro video → photo sequence → outro
 // ─────────────────────────────────────────────────────────────────────────────
 
 class PreschoolTour {
@@ -11,25 +11,61 @@ class PreschoolTour {
     this.state      = null;
 
     // DOM refs
-    this.videoScreen  = document.getElementById('video-screen');
-    this.photoScreen  = document.getElementById('photo-screen');
-    this.video        = document.getElementById('tour-video');
-    this.videoSrc     = document.getElementById('video-src');
-    this.videoLabel   = document.getElementById('video-label');
-    this.photo        = document.getElementById('tour-photo');
-    this.hotspot      = document.getElementById('hotspot');
-    this.dots         = document.getElementById('progress-dots');
-    this.progressLbl  = document.getElementById('progress-label');
-    this.overlay      = document.getElementById('transition-overlay');
+    this.splash        = document.getElementById('splash-screen');
+    this.loaderBar     = document.querySelector('.loader-bar');
+    this.videoScreen   = document.getElementById('video-screen');
+    this.photoScreen   = document.getElementById('photo-screen');
+    this.completeScreen= document.getElementById('complete-screen');
+    this.video         = document.getElementById('tour-video');
+    this.outroVideo    = document.getElementById('outro-video');
+    this.videoSrc      = document.getElementById('video-src');
+    this.outroSrc      = document.getElementById('outro-src');
+    this.videoLabel    = document.getElementById('video-label');
+    this.tapHint       = document.getElementById('video-tap-hint');
+    this.photo         = document.getElementById('tour-photo');
+    this.hotspot       = document.getElementById('hotspot');
+    this.dots          = document.getElementById('progress-dots');
+    this.progressLbl   = document.getElementById('progress-label');
+    this.progressFill  = document.getElementById('progress-fill');
+    this.overlay       = document.getElementById('transition-overlay');
+    this.completeOverlay = document.getElementById('complete-overlay');
+    this.restartBtn    = document.getElementById('restart-btn');
 
     this._buildDots();
     this._bindEvents();
-    this._start();
+    this._showSplash();
   }
 
-  // ── Boot ────────────────────────────────────────────────────────────────
+  // ── Splash ───────────────────────────────────────────────────────────────
 
-  _start() {
+  _showSplash() {
+    // Animate loader bar over 2.2s then start tour
+    const duration = 2200;
+    const start = performance.now();
+
+    const tick = (now) => {
+      const pct = Math.min((now - start) / duration * 100, 100);
+      this.loaderBar.style.width = pct + '%';
+      if (pct < 100) {
+        requestAnimationFrame(tick);
+      } else {
+        setTimeout(() => this._hideSplash(), 300);
+      }
+    };
+    requestAnimationFrame(tick);
+  }
+
+  _hideSplash() {
+    this.splash.classList.add('hidden');
+    setTimeout(() => {
+      this.splash.style.display = 'none';
+      this._playIntroVideo();
+    }, 800);
+  }
+
+  // ── Boot ─────────────────────────────────────────────────────────────────
+
+  _playIntroVideo() {
     this._playVideo(this.config.introVideo, 'Introduction', () => {
       this._fadeOut(() => {
         this._setState('photo');
@@ -39,45 +75,47 @@ class PreschoolTour {
     });
   }
 
-  // ── State ────────────────────────────────────────────────────────────────
+  // ── State ─────────────────────────────────────────────────────────────────
 
   _setState(state) {
     this.state = state;
-    this.videoScreen.classList.toggle('active', state === 'video');
-    this.photoScreen.classList.toggle('active', state === 'photo');
+    this.videoScreen.classList.toggle('active',    state === 'video');
+    this.photoScreen.classList.toggle('active',    state === 'photo');
+    this.completeScreen.classList.toggle('active', state === 'complete');
   }
 
-  // ── Video playback ───────────────────────────────────────────────────────
+  // ── Video playback ────────────────────────────────────────────────────────
 
   _playVideo(src, label, onEnd) {
     this._setState('video');
+    this.tapHint.classList.remove('visible');
     this.videoLabel.textContent = label || '';
     this.videoSrc.src = src;
     this.video.load();
     this.video.play().catch(() => {
-      // Autoplay blocked — wait for user tap
-      const resume = () => { this.video.play(); this.video.removeEventListener('click', resume); };
+      this.tapHint.classList.add('visible');
+      const resume = () => {
+        this.video.play();
+        this.video.removeEventListener('click', resume);
+        this.tapHint.classList.remove('visible');
+      };
       this.video.addEventListener('click', resume);
     });
     this._onVideoEnd = onEnd;
   }
 
-  // ── Photo sequence ───────────────────────────────────────────────────────
+  // ── Photo sequence ────────────────────────────────────────────────────────
 
   _showPhoto(index) {
     const step = this.photos[index];
     this.photoIndex = index;
-
-    // Set photo src
     this.photo.src = step.src;
 
-    // Position hotspot via CSS custom properties
     const hx = step.hotspot?.x ?? 50;
     const hy = step.hotspot?.y ?? 75;
     this.hotspot.style.setProperty('--hx', hx);
     this.hotspot.style.setProperty('--hy', hy);
 
-    // Update progress
     this._updateProgress(index);
   }
 
@@ -89,17 +127,41 @@ class PreschoolTour {
         this._fadeIn();
       });
     } else {
-      // Last photo done → play outro
       this._fadeOut(() => {
-        this._playVideo(this.config.outroVideo, 'You have arrived', () => {
-          this._setState('video'); // stay on video screen, tour complete
-        });
+        this._playOutro();
         this._fadeIn();
       });
     }
   }
 
-  // ── Progress indicator ───────────────────────────────────────────────────
+  // ── Outro / Complete ──────────────────────────────────────────────────────
+
+  _playOutro() {
+    this._setState('complete');
+    // Load & play outro video behind the overlay
+    this.outroSrc.src = this.config.outroVideo;
+    this.outroVideo.load();
+    this.outroVideo.play().catch(() => {});
+
+    // Show the complete overlay (auto-show on video end, or after delay)
+    const showComplete = () => {
+      this.completeOverlay.classList.add('visible');
+    };
+    this.outroVideo.addEventListener('ended', showComplete, { once: true });
+    // Also show after 3s as fallback if video is short/fails
+    setTimeout(showComplete, 3000);
+  }
+
+  _restart() {
+    this.completeOverlay.classList.remove('visible');
+    this._fadeOut(() => {
+      this.photoIndex = 0;
+      this._playIntroVideo();
+      this._fadeIn();
+    });
+  }
+
+  // ── Progress indicator ────────────────────────────────────────────────────
 
   _buildDots() {
     this.dots.innerHTML = '';
@@ -113,14 +175,20 @@ class PreschoolTour {
 
   _updateProgress(index) {
     const total = this.photos.length;
+
     document.querySelectorAll('.dot').forEach((dot, i) => {
       dot.classList.toggle('active', i === index);
       dot.classList.toggle('done',   i < index);
     });
+
     this.progressLbl.textContent = `Step ${index + 1} of ${total}`;
+
+    // Progress bar fill
+    const pct = total <= 1 ? 100 : (index / (total - 1)) * 100;
+    this.progressFill.style.width = pct + '%';
   }
 
-  // ── Transitions ──────────────────────────────────────────────────────────
+  // ── Transitions ───────────────────────────────────────────────────────────
 
   _fadeOut(cb) {
     this.overlay.classList.add('visible');
@@ -133,18 +201,17 @@ class PreschoolTour {
     }));
   }
 
-  // ── Events ───────────────────────────────────────────────────────────────
+  // ── Events ────────────────────────────────────────────────────────────────
 
   _bindEvents() {
-    // Video ended
     this.video.addEventListener('ended', () => {
       if (this._onVideoEnd) this._onVideoEnd();
     });
 
-    // Hotspot click / tap
     this.hotspot.addEventListener('click', () => this._advance());
 
-    // Keyboard: space / enter / right arrow also advance
+    this.restartBtn.addEventListener('click', () => this._restart());
+
     document.addEventListener('keydown', e => {
       if (['ArrowRight', 'Space', 'Enter'].includes(e.code) && this.state === 'photo') {
         e.preventDefault();
@@ -160,9 +227,11 @@ window.addEventListener('DOMContentLoaded', () => {
     .then(r => r.json())
     .then(config => new PreschoolTour(config))
     .catch(err => {
-      document.body.innerHTML = `<div style="color:#fff;padding:40px;font-family:sans-serif">
-        <h2>Config error</h2><p>${err.message}</p>
-        <p>Make sure config.json exists and the app is served over HTTP (not file://).</p>
+      document.body.innerHTML = `<div style="color:#fff;padding:40px;font-family:sans-serif;background:#1a1a2e;height:100vh;display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:center;text-align:center">
+        <div style="font-size:48px">⚠️</div>
+        <h2 style="font-size:22px">Config Error</h2>
+        <p style="opacity:0.6">${err.message}</p>
+        <p style="opacity:0.4;font-size:13px">Make sure config.json exists and the app is served over HTTP.</p>
       </div>`;
     });
 });
