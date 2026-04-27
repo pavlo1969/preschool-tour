@@ -146,9 +146,15 @@ class PreschoolTour {
     if (this.config.outroVideo) {
       this.outroSrc.src = this.config.outroVideo;
       this.outroVideo.load();
-      this.outroVideo.play().catch(() => {});
+      this.outroVideo.play().catch(() => {
+        // Autoplay blocked — show complete screen on tap
+        const resume = () => {
+          this.outroVideo.play();
+          this.outroVideo.removeEventListener('click', resume);
+        };
+        this.outroVideo.addEventListener('click', resume);
+      });
       this.outroVideo.addEventListener('ended', showComplete, { once: true });
-      setTimeout(showComplete, 3000);
     } else {
       setTimeout(showComplete, 400);
     }
