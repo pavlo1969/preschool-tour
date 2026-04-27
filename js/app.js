@@ -66,7 +66,7 @@ class PreschoolTour {
   // ── Boot ─────────────────────────────────────────────────────────────────
 
   _playIntroVideo() {
-    this._playVideo(this.config.introVideo, 'Introduction', () => {
+    this._playVideo(this.config.introVideo, 'Вступ', () => {
       this._fadeOut(() => {
         this._setState('photo');
         this._showPhoto(0);
@@ -138,18 +138,20 @@ class PreschoolTour {
 
   _playOutro() {
     this._setState('complete');
-    // Load & play outro video behind the overlay
-    this.outroSrc.src = this.config.outroVideo;
-    this.outroVideo.load();
-    this.outroVideo.play().catch(() => {});
 
-    // Show the complete overlay (auto-show on video end, or after delay)
     const showComplete = () => {
       this.completeOverlay.classList.add('visible');
     };
-    this.outroVideo.addEventListener('ended', showComplete, { once: true });
-    // Also show after 3s as fallback if video is short/fails
-    setTimeout(showComplete, 3000);
+
+    if (this.config.outroVideo) {
+      this.outroSrc.src = this.config.outroVideo;
+      this.outroVideo.load();
+      this.outroVideo.play().catch(() => {});
+      this.outroVideo.addEventListener('ended', showComplete, { once: true });
+      setTimeout(showComplete, 3000);
+    } else {
+      setTimeout(showComplete, 400);
+    }
   }
 
   _restart() {
@@ -181,7 +183,7 @@ class PreschoolTour {
       dot.classList.toggle('done',   i < index);
     });
 
-    this.progressLbl.textContent = `Step ${index + 1} of ${total}`;
+    this.progressLbl.textContent = `Крок ${index + 1} з ${total}`;
 
     // Progress bar fill
     const pct = total <= 1 ? 100 : (index / (total - 1)) * 100;
